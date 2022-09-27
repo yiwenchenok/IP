@@ -77,7 +77,6 @@ def save_data(list):
         write = csv.writer(file)
         write.writerow(['ip地址'])
         for i in list:
-            i.replace(' ','')
             write.writerow([i])
 
 
