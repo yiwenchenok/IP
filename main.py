@@ -10,9 +10,11 @@ urlha = 'https://www.kuaidaili.com/free/inha/{}/'  # 快代理高匿代理池
 urltr = 'https://www.kuaidaili.com/free/intr/{}/'  # 快代理普通代理池
 url66ip = 'http://www.66ip.cn/{}.html'  # 66ip代理获取
 urlyun = 'http://www.ip3366.net/?stype=1&page={}'  # 云ip代理获取
+urlqiyun='https://proxy.ip3366.net/free/?action=china&page={}'# 齐云ip获取
 urlkaixinha = 'http://www.kxdaili.com/dailiip/1/{}.html'  # 开心高匿ip代理获取
 urlkaixintr = 'http://www.kxdaili.com/dailiip/2/{}.html'  # 开心普通ip代理获取
 url89 = 'https://www.89ip.cn/index_{}.html'  # 89ip代理获取
+
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15"
@@ -41,7 +43,6 @@ user_agents = [
 
 
 def get_url(url):
-    print(url)
     user_agent = random.choice(user_agents)
     headers.update({"User-Agent": user_agent})
     response = requests.get(url=url, headers=headers)
@@ -54,15 +55,14 @@ def get_data(html):
     all = selector.xpath('//*[@id="list"]/table/tbody/tr') or selector.xpath(
         '//*[@id="main"]/div[1]/div[2]/div[1]/table/tr') or selector.xpath(
         '//div[2]/table//tr') or selector.xpath(
-        '//div[1]/table//tr')
+        '//div[1]/table//tr') or selector.xpath('//*[@id="content"]/section/div[2]/table//tr')
 
-    print(all)
     list = []
     for iplist in all:
         try:
-            ip = iplist.xpath('./td[1]/text()')[0]
-            local = iplist.xpath('./td[2]/text()')[0]
-            ipaddresss = ip.split(' ','') + ':' + local.split(' ','')
+            ip = iplist.xpath('./td[1]/text()')[0].strip() # .strip()两边去空
+            local = iplist.xpath('./td[2]/text()')[0].strip()
+            ipaddresss = ip + ':' + local
             list.append(ipaddresss)
         except Exception as e:
             pass
@@ -77,6 +77,7 @@ def save_data(list):
         write = csv.writer(file)
         write.writerow(['ip地址'])
         for i in list:
+            i.replace(' ','')
             write.writerow([i])
 
 
@@ -126,6 +127,10 @@ def circulate():
         time.sleep(1)
         list += get_data(html)
 
+        html = get_url(urlqiyun.format(page))  # 齐云ip代理爬取
+        time.sleep(1)
+        list += get_data(html)
+
         html = get_url(urlkaixinha.format(page))  # 开心高匿ip代理获取
         time.sleep(1)
         list += get_data(html)
@@ -137,8 +142,6 @@ def circulate():
         html = get_url(url89.format(page))  # 89ip代理获取
         time.sleep(1)
         list += get_data(html)
-
-
     return list
 
 
