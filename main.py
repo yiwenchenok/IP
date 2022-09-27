@@ -110,7 +110,7 @@ def visit(iplist):  # 访问itrun.xyz
 
 def circulate():
     list = []
-    for page in range(1, 2):
+    for page in range(1, 3):
         html = get_url(urlha.format(page))  # 高匿代理爬取
         time.sleep(1)
         list += get_data(html)
